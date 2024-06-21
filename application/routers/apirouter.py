@@ -1,9 +1,12 @@
-from fastapi import APIRouter, HTTPException
-from typing import Optional
+from fastapi import APIRouter
 from pydantic import BaseModel
 import pika
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 class SchedulerJob(BaseModel):
@@ -79,7 +82,7 @@ async def get_scheduled_jobs():
     return {"jobs":schedules}
 
 def executeJob(queue, message):
-    params = pika.URLParameters('amqp://admin:admin@127.0.0.1:5672')
+    params = pika.URLParameters(os.getenv('RABBIT_SERVER_URL'))
     params.socket_timeout = 5
 
     connection = pika.BlockingConnection(params)  # Connect to CloudAMQP

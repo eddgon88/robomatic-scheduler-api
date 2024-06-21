@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+#get name of the current directory
+NAME=$(basename "$PWD")
+
+#run the docker
+docker run --name $NAME --network robomatic -p 5005:5005 $NAME
