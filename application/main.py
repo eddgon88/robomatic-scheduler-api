@@ -5,7 +5,8 @@ from . import config
 
 app_configs = {"title": "sckeduler-api",
                "HOST": config.HOST,
-               "RABBIT_SERVER_URL": config.RABBIT_SERVER_URL}
+               "RABBIT_SERVER_URL": config.RABBIT_SERVER_URL,
+               "DB_SERVER_URL": config.DB_SERVER_URL}
 
 def create_app():
     app = FastAPI()

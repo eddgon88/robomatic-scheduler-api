@@ -1,28 +1,32 @@
 from fastapi import APIRouter
 from application.models.scheduler_job_model import SchedulerJob
 from application.services.scheduler_service import ScheduleService
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
 router = APIRouter(prefix="/scheduler/v1")
 schedule = ScheduleService()
 
-#@router.on_event("startup")
-#async def load_schedule_or_create_blank():
-#    """
-#    Instatialise the Schedule Object as a Global Param and also load existing Schedules from SQLite
-#    This allows for persistent schedules across server restarts. 
-#    """
-#    global Schedule
-#
-#    try:
-#        jobstores = {
-#            'default': SQLAlchemyJobStore(url='sqlite:///jobs.sqlite')
-#        }
-#        Schedule = BackgroundScheduler(jobstores=jobstores)
-#        Schedule.start()
-#        #logger.info("Created Schedule Object")   
-#    except:    
-#        #logger.error("Unable to Create Schedule Object")   
-#        print("Unable to Create Schedule Object")
+@router.on_event("startup")
+async def load_schedule_or_create_blank():
+    """
+    Instatialise the Schedule Object as a Global Param and also load existing Schedules from SQLite
+    This allows for persistent schedules across server restarts. 
+    """
+    global Schedule
+
+    try:
+        #jobstores = {
+        #    'default': SQLAlchemyJobStore(url='sqlite:///jobs.sqlite')
+        #}
+        #Schedule = BackgroundScheduler(jobstores=jobstores)
+        #Schedule.start()
+        print("Creating Schedule Object")
+        Schedule = ScheduleService()
+        print("Created Schedule Object")   
+    except:    
+        #logger.error("Unable to Create Schedule Object")   
+        print("Unable to Create Schedule Object")
 
 @router.on_event("shutdown")
 async def pickle_schedule():
