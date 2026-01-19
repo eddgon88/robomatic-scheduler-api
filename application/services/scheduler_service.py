@@ -33,10 +33,18 @@ class ScheduleService:
             "default": ThreadPoolExecutor(20)
         }
 
+        # Configuración por defecto para los jobs
+        self.job_defaults = {
+            "coalesce": True,       # Combina ejecuciones perdidas en una sola
+            "max_instances": 1,     # Solo una instancia del job puede ejecutarse a la vez
+            "misfire_grace_time": 60  # Tiempo de gracia de 60 segundos para ejecuciones perdidas
+        }
+
         # Configuración del scheduler
         self.scheduler = BackgroundScheduler(
             jobstores=self.jobstores,
             executors=self.executors,
+            job_defaults=self.job_defaults,
             timezone=pytz.timezone("Etc/GMT-3")
         )
 
@@ -59,15 +67,18 @@ class ScheduleService:
         Añade un nuevo trabajo al scheduler.
         """
         try:
-            logger.info(f"identificando trigger: {config.trigger_type}")
+            logger.info(f"Identificando trigger: {config.trigger_type}")
             trigger = self.get_trigger(config)
             logger.info(f"Añadiendo trabajo: {config.job_id}")
             job = self.scheduler.add_job(
-                func=execute_job,  # Función a ejecutar
+                func=execute_job,
                 trigger=trigger,
                 id=config.job_id,
-                args=[config.__dict__],  # Argumentos de la función
-                replace_existing=True
+                args=[config.__dict__],
+                replace_existing=True,
+                coalesce=True,
+                max_instances=1,
+                misfire_grace_time=60
             )
             logger.info(f"Trabajo {config.job_id} añadido: {job}")
             return {"message": "Job added", "job_id": config.job_id}
